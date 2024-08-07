@@ -1,54 +1,26 @@
+username = ENV["USER"] || "mbraets"
+
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/alpine318"
   config.vm.synced_folder "shared/", "/vagrant_shared/"
+  config.ssh.forward_agent = true
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"
     vb.cpus = 1
   end
 
-  config.ssh.forward_agent = true
-  config.ssh.username = "vagrant"
-
-  config.vm.define "mbouquetS" do |server|
-    server.vm.hostname = "mbouquetS"
+  config.vm.define "#{username}S" do |server|
+    server.vm.hostname = "#{username}S"
     server.vm.network "private_network", ip: "192.168.56.110"
-
-    server.vm.provision "shell", privileged: true, inline: <<-SHELL
-      echo "Hello, i'm the master"
-      apk update
-
-      curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-      chmod +x kubectl
-
-      # INSTALL_K3S_EXEC is used to configure the installation
-      #  https://docs.k3s.io/reference/env-variables 
-      export INSTALL_K3S_EXEC="server --node-external-ip=192.168.56.110 --bind-address=192.168.56.110 --flannel-iface=eth1"
-      curl -sfL https://get.k3s.io | sh -
-      echo "k3s is installing"
-      sleep 12
-      chmod a+r /etc/rancher/k3s/k3s.yaml
-      cp /var/lib/rancher/k3s/server/token /vagrant_shared/
-      cp /etc/rancher/k3s/k3s.yaml /vagrant_shared/
-
-      echo 'source <(kubectl completion bash)' >>~/.bashrc
-      echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
-    SHELL
-
+    server.vm.provision "shell", privileged: true, path: "./scripts/server.sh", args: "192.168.56.110"
   end  
 
-  config.vm.define "mbouquetSW" do |serverWorker|
-    serverWorker.vm.hostname = "mbouquetSW"
+  config.vm.define "#{username}SW" do |serverWorker|
+    serverWorker.vm.hostname = "#{username}SW"
     serverWorker.vm.network "private_network", ip: "192.168.56.111"
 
-    serverWorker.vm.provision "shell", privileged: true, inline: <<-SHELL
-      echo "Hello, i'm the node"
-      apk update
-      export INSTALL_K3S_EXEC="--flannel-iface=eth1"
-      export K3S_TOKEN_FILE=/vagrant_shared/token
-      export K3S_URL=https://192.168.56.110:6443
-      curl -sfL https://get.k3s.io |  sh -
-    SHELL
+    serverWorker.vm.provision "shell", privileged: true, path: "./scripts/worker.sh", args: ["192.168.56.110", "6443"]
   end 
 
 end
