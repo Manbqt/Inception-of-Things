@@ -1,0 +1,18 @@
+username = ENV["USER"] || "mbraets"
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/alpine318"
+  config.vm.synced_folder "containers/", "/vagrant_shared/"
+  config.ssh.forward_agent = true
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+    vb.cpus = 1
+  end
+
+  config.vm.define "#{username}S" do |server|
+    server.vm.hostname = "#{username}S"
+    server.vm.network "private_network", ip: "192.168.56.110"
+    server.vm.provision "shell", privileged: true, path: "./scripts/server.sh", args: "192.168.56.110"
+  end
+end
