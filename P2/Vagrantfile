@@ -2,7 +2,7 @@ username = ENV["USER"] || "mbraets"
 
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/alpine318"
-  config.vm.synced_folder "config/", "/vagrant_shared/"
+  config.vm.synced_folder "helm/", "/vagrant_shared/"
   config.ssh.forward_agent = true
 
   config.vm.provider "virtualbox" do |vb|

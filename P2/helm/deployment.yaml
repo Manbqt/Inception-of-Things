@@ -18,4 +18,5 @@ spec:
           image: {{ .image }}
           ports:
             - containerPort: {{ .port }}
+---
 {{- end }}
