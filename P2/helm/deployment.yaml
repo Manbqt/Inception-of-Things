@@ -18,5 +18,8 @@ spec:
           image: {{ .image }}
           ports:
             - containerPort: {{ .port }}
+          env:
+          - name: MESSAGE
+            value: {{ .message }}
 ---
 {{- end }}

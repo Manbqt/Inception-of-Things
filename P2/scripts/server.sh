@@ -19,15 +19,21 @@ do
 done
 echo "k3s is installed"
 
+# Chart helm creation
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 helm create mychart
 sleep 5
 
+# Replace all templates to only keep the necessary
+rm -r mychart/templates/*
 cp -f /vagrant_shared/service.yaml mychart/templates/service.yaml
 cp -f /vagrant_shared/deployment.yaml mychart/templates/deployment.yaml
 cp -f /vagrant_shared/values.yaml mychart/values.yaml
+cp -f /vagrant_shared/ingress.yaml mychart/templates/ingress.yaml
 
+# Template verification and displaying
 helm template my-release mychart/ -f mychart/values.yaml
+# Install all templates
 helm install -f mychart/values.yaml mychart mychart/
 
 echo 'source <(kubectl completion bash)' >> ~/.bashrc

@@ -4,11 +4,10 @@ kind: Service
 metadata:
   name: {{ .name }}
 spec:
-  type: ClusterIP
   ports:
     - protocol: TCP
       port: {{ .port }}
-      targetPort: {{ .port }}
+      targetPort: {{ .targetport }}
   selector:
     app: {{ .name }}
 ---
