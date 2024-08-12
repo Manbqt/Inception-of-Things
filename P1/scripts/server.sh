@@ -22,6 +22,6 @@ echo "k3s is installed"
 # Token used to create link with the worker
 cp /var/lib/rancher/k3s/server/token /vagrant_shared/
 
-echo 'source <(kubectl completion bash)' >> ~/.bashrc
-echo 'complete -o default -F __start_kubectl k' >> ~/.bashrc
-echo "alias k='kubectl'" >> ~/.bashrc
+echo 'source <(kubectl completion bash)' >> .bashrc
+echo 'alias k=kubectl' >> .bashrc
+echo 'complete -o default -F __start_kubectl k' >> .bashrc

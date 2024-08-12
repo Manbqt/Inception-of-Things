@@ -36,5 +36,7 @@ helm template my-release mychart/ -f mychart/values.yaml
 # Install all templates
 helm install -f mychart/values.yaml mychart mychart/
 
-echo 'source <(kubectl completion bash)' >> ~/.bashrc
-echo 'complete -o default -F __start_kubectl k' >> ~/.bashrc
+echo 'source <(kubectl completion bash)' >> .bashrc
+echo 'alias k=kubectl' >> .bashrc
+echo 'complete -o default -F __start_kubectl k' >> .bashrc
+
