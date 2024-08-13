@@ -1,29 +1,38 @@
 #!/bin/bash
 
-apt update
-apt install curl
-
-#Docker installation
-sudo apt install apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-apt-cache policy docker-ce
-sudo apt install docker-ce
+sudo apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+sudo echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo systemctl enable docker
 
 # Give permissions
-sudo groupadd -f docker
-sudo usermod -aG docker $USER
-newgrp docker << EOF
-echo "Group Docker reloaded."
-EOF
+sudo chown $USER /var/run/docker.sock 
 
 # K3d installation
 curl https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
 # Kubectl installation
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-chmod +x kubectl
+# curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+# chmod +x kubectl
 # sudo mv kubectl /usr/local/bin/
+
+sudo apt-get install -y apt-transport-https ca-certificates gnupg
+if [ ! -f /etc/apt/keyrings]
+then
+	echo "file /etc/apt/keyrings is created"
+	touch /etc/apt/keyrings
+fi
+
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg 
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubectl
+
 
 # Delete old cluster
 k3d cluster delete mycluster
@@ -41,5 +50,11 @@ k3d kubeconfig merge mycluster --kubeconfig-switch-context
 
 # Create a namespace
 kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+sleep 20
+
 kubectl create namespace dev
+# wil42/playground:v1
+# kubectl create deployment my-dep --image=busybox --port=5701
 
