@@ -20,7 +20,7 @@ curl https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 # sudo mv kubectl /usr/local/bin/
 
 sudo apt-get install -y apt-transport-https ca-certificates gnupg
-if [ ! -f /etc/apt/keyrings]
+if [ ! -f /etc/apt/keyrings ]
 then
 	echo "file /etc/apt/keyrings is created"
 	touch /etc/apt/keyrings
@@ -32,7 +32,6 @@ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
 sudo apt-get install -y kubectl
-
 
 # Delete old cluster
 k3d cluster delete mycluster
@@ -55,6 +54,16 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 sleep 20
 
 kubectl create namespace dev
-# wil42/playground:v1
-# kubectl create deployment my-dep --image=busybox --port=5701
+sleep 20
+
+kubectl apply -n argocd -f ../config/appproject.yaml
+kubectl apply -n argocd -f ../config/application.yaml
+kubectl apply -n dev -f ../config/ingress.yaml
+
+sleep 20
+
+passwd=kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+echo "Username: Admin Passwd: $passwd"
+
+kubectl -n argocd port-forward service/argocd-server 8080:80
 

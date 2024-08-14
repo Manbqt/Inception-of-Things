@@ -1,0 +1,13 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: wil-playground
+  namespace: argocd
+spec:
+  sourceRepos:
+    - https://github.com/Manbqt/argocd-mbouquet.git
+  destinations:
+    - namespace: dev
+      server: 'https://kubernetes.default.svc' 
+  sourceNamespaces:
+  - dev
