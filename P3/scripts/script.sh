@@ -39,7 +39,7 @@ k3d cluster delete mycluster
 k3d cluster create mycluster
 
 export KUBECONFIG_MODE="644"
-export KUBECONFIG=/home/manon/.config/k3d/kubeconfig-mycluster.yaml
+export KUBECONFIG="/home/$USER/.config/k3d/kubeconfig-mycluster.yaml"
 
 # Set the context
 kubectl config delete-context k3d-mycluster
@@ -57,7 +57,7 @@ kubectl apply --wait -n argocd -f ../config/appproject.yaml
 kubectl apply --wait -n argocd -f ../config/application.yaml
 kubectl apply --wait -n dev -f ../config/ingress.yaml
 
-passwd=kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+passwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 echo "Username: Admin Passwd: $passwd"
 
 kubectl -n argocd port-forward service/argocd-server 8080:80
