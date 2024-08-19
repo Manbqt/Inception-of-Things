@@ -53,11 +53,16 @@ k3d kubeconfig merge mycluster --kubeconfig-switch-context
 kubectl create namespace argocd
 kubectl apply --wait -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
+sleep 20
+
 kubectl create namespace dev
 
 kubectl apply --wait -n argocd -f ../config/appproject.yaml
 kubectl apply --wait -n argocd -f ../config/application.yaml
 kubectl apply --wait -n dev -f ../config/ingress.yaml
+
+# Wait for argocd-server to be ready
+sleep 20
 
 passwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 echo "Username: Admin Passwd: $passwd"
