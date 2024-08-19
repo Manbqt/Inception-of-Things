@@ -9,6 +9,6 @@ This project is an introduction of `Kubernetes (K8s)`.  It's a software to handl
 ### [Master and worker](./P1/README.md)
 
 ### [Pods](https://kubernetes.io/fr/docs/concepts/workloads/pods/pod-overview/)
-The pod is the smallest kubernetes unit, it's an `environment`, a single instance of an application/service. So to create `replicas` many pods mus` used.  
+The pod is the smallest kubernetes unit, it's an `environment`, a single instance of an application/service. So to create `replicas` many pods must used.  
 Each pod is `isolated`, have an IP address, a namespace and a volume.  
 All external communications require configuration. So each containers in pod can communicate.  
