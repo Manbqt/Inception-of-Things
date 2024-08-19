@@ -2,7 +2,7 @@
 
 This project is an introduction of `Kubernetes (K8s)`.  It's a software to handle containers, their lifecycle.
 
-## [K8s]("https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/introduction/")'s organisation:
+## [K8s](https://blog.stephane-robert.info/docs/conteneurs/orchestrateurs/kubernetes/introduction/)'s organisation:
 
 ![alt text](resources/k8s_shema.png)
 
