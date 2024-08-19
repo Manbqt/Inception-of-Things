@@ -9,7 +9,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io
 sudo systemctl enable docker
 
 # Give permissions
-sudo chown $USER /var/run/docker.sock 
+sudo chown $USER /var/run/docker.sock
 
 # K3d installation
 curl https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
@@ -27,7 +27,7 @@ then
 fi
 
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg 
+sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
@@ -49,18 +49,13 @@ k3d kubeconfig merge mycluster --kubeconfig-switch-context
 
 # Create a namespace
 kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-
-sleep 20
+kubectl apply --wait -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 kubectl create namespace dev
-sleep 20
 
-kubectl apply -n argocd -f ../config/appproject.yaml
-kubectl apply -n argocd -f ../config/application.yaml
-kubectl apply -n dev -f ../config/ingress.yaml
-
-sleep 20
+kubectl apply --wait -n argocd -f ../config/appproject.yaml
+kubectl apply --wait -n argocd -f ../config/application.yaml
+kubectl apply --wait -n dev -f ../config/ingress.yaml
 
 passwd=kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 echo "Username: Admin Passwd: $passwd"
