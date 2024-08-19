@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd $(dirname $0)
+
 sudo apt-get update
 sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
 sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
