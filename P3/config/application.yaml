@@ -9,7 +9,7 @@ spec:
     namespace: dev
     server: https://kubernetes.default.svc
   source:
-    path: /manifest/
+    path: manifest/
     repoURL: https://github.com/Manbqt/argocd-mbouquet.git
     targetRevision: HEAD
   syncPolicy:
