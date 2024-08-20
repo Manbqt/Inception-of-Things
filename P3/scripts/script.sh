@@ -54,9 +54,8 @@ install_argocd() {
 }
 
 argocd() {
-	kubectl apply --wait -f ../config/appproject.yaml
-	kubectl apply --wait -f ../config/application.yaml
-	kubectl apply --wait -f ../config/argocd_ingress.yaml
+	kubectl apply -n argocd --wait -f ../config/appproject.yaml
+	kubectl apply -n argocd --wait -f ../config/application.yaml
 
 	passwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 	echo "Username: \`admin\` Password: \`$passwd\`"
@@ -70,7 +69,7 @@ wait_argocd() {
 dev() {
 	kubectl create namespace dev
 
-	kubectl apply --wait -f ../config/dev_ingress.yaml
+	kubectl apply -n dev --wait -f ../config/dev_ingress.yaml
 }
 
 no_install() {
@@ -78,6 +77,7 @@ no_install() {
 	wait_argocd
 	argocd
 	dev
+	kubectl -n argocd port-forward service/argocd-server 8080:80
 }
 
 if [ $# -eq 0 ]
