@@ -33,11 +33,11 @@ install () {
 	sudo apt-get install -y kubectl
 }
 
-argocd() {
+install_argocd() {
 	# Delete old cluster
 	k3d cluster delete mycluster
 	# Create a cluster
-	k3d cluster create mycluster
+	k3d cluster create mycluster --port 8888:80
 
 	export KUBECONFIG_MODE="644"
 	export KUBECONFIG="/home/$USER/.config/k3d/kubeconfig-mycluster.yaml"
@@ -53,6 +53,15 @@ argocd() {
 	kubectl apply --wait -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 }
 
+argocd() {
+	kubectl apply --wait -f ../config/appproject.yaml
+	kubectl apply --wait -f ../config/application.yaml
+	kubectl apply --wait -f ../config/argocd_ingress.yaml
+
+	passwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+	echo "Username: Admin Passwd: $passwd"
+}
+
 wait_argocd() {
 	# Wait for argocd-server to be ready
 	kubectl -n argocd wait --for=condition=available --timeout=600s deployment/argocd-server
@@ -61,19 +70,13 @@ wait_argocd() {
 dev() {
 	kubectl create namespace dev
 
-	kubectl apply --wait -n argocd -f ../config/appproject.yaml
-	kubectl apply --wait -n argocd -f ../config/application.yaml
-	kubectl apply --wait -n dev -f ../config/ingress.yaml
-
-	passwd=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
-	echo "Username: Admin Passwd: $passwd"
-
-	kubectl -n argocd port-forward service/argocd-server 8080:80
+	kubectl apply --wait -f ../config/dev_ingress.yaml
 }
 
 if [ $# -eq 0 ]
 then
 	install
+	install_argocd
 	argocd
 	wait_argocd
 	dev
