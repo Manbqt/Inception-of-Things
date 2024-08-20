@@ -52,7 +52,15 @@ gitlab() {
 	kubectl create namespace gitlab
 
 	helm repo add gitlab https://charts.gitlab.io/
-	helm install gitlab gitlab/gitlab -n gitlab -f ../config/gitlab_values.yaml
+	helm repo update
+	helm upgrade --install gitlab gitlab/gitlab \
+		-n gitlab \
+		--timeout 600s \
+		--set global.hosts.domain=gitlab.local \
+		--set global.hosts.externalIP=0.0.0.0 \
+		--set certmanager-issuer.email=me@gitlab.local
+
+	echo "The password of gitlab root is \`$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode)\`"
 }
 
 if [ $# -eq 0 ]
@@ -62,6 +70,7 @@ then
 	wait_argocd
 	argocd
 	dev
+	gitlab
 else
 	$1
 fi
