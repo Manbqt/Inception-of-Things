@@ -54,13 +54,15 @@ gitlab() {
 	helm repo add gitlab https://charts.gitlab.io/
 	helm repo update
 	helm upgrade --install gitlab gitlab/gitlab \
-		-n gitlab \
-		--timeout 600s \
-		--set global.hosts.domain=gitlab.local \
-		--set global.hosts.externalIP=0.0.0.0 \
-		--set certmanager-issuer.email=me@gitlab.local
+  		-n gitlab \
+  		-f https://gitlab.com/gitlab-org/charts/gitlab/raw/master/examples/values-minikube-minimum.yaml \
+  		--set global.hosts.domain=gitlab.local \
+  		--set global.hosts.externalIP=0.0.0.0 \
+  		--set global.hosts.https=false
+
 
 	echo "The password of gitlab root is \`$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode)\`"
+
 }
 
 if [ $# -eq 0 ]
