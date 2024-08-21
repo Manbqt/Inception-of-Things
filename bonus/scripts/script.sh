@@ -27,6 +27,9 @@ install_argocd() {
 	# Create a namespace
 	kubectl create namespace argocd
 	kubectl apply --wait -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+	# Disable server.insecure for argocd
+	kubectl patch configmap argocd-cmd-params-cm -n argocd -p '{"data": {"server.insecure": "true"}}'
 }
 
 argocd() {
@@ -37,6 +40,10 @@ argocd() {
 	echo "Username: \`admin\` Password: \`$passwd\`"
 }
 
+forward() {
+	kubectl -n argocd port-forward service/argocd-server 8080:80 --address=0.0.0.0
+}
+
 wait_argocd() {
 	# Wait for argocd-server to be ready
 	kubectl -n argocd wait --for=condition=available --timeout=600s deployment/argocd-server
@@ -45,7 +52,7 @@ wait_argocd() {
 dev() {
 	kubectl create namespace dev
 
-	kubectl apply -n dev --wait -f ../config/dev_ingress.yaml
+	kubectl apply --wait -f ../config/dev_ingress.yaml
 }
 
 gitlab() {
@@ -69,8 +76,9 @@ then
 	install_argocd
 	wait_argocd
 	argocd
-	dev
 	gitlab
+	dev
+	forward
 else
 	$1
 fi
