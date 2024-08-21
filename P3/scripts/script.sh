@@ -71,12 +71,16 @@ dev() {
 	kubectl apply -n dev --wait -f ../config/dev_ingress.yaml
 }
 
+forward() {
+	kubectl -n argocd port-forward service/argocd-server 8080:80
+}
+
 no_install() {
 	install_argocd
 	wait_argocd
 	argocd
 	dev
-	kubectl -n argocd port-forward service/argocd-server 8080:80
+	forward
 }
 
 if [ $# -eq 0 ]
@@ -86,6 +90,7 @@ then
 	wait_argocd
 	argocd
 	dev
+	forward
 else
 	$1
 fi
