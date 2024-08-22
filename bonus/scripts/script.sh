@@ -4,11 +4,13 @@ cd $(dirname $0)
 
 install_docker() {
 	sudo apt-get update
-	sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
-	sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-	sudo echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
-	sudo apt-get update
-	sudo apt-get install docker-ce docker-ce-cli containerd.io
+	sudo apt-get install --only-upgrade -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
+	if [ ! -f /usr/share/keyrings/docker-archive-keyring.gpg ]
+	then
+		sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+		sudo echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+	fi
+	sudo apt-get install --only-upgrade -y docker-ce docker-ce-cli containerd.io
 	sudo systemctl enable docker
 
 	# Give permissions
@@ -20,19 +22,17 @@ install_k3d() {
 }
 
 install_kubectl() {
-	sudo apt-get install -y apt-transport-https ca-certificates gnupg
-	if [ ! -f /etc/apt/keyrings ]
-	then
-		echo "file /etc/apt/keyrings is created"
-		touch /etc/apt/keyrings
-	fi
+	sudo apt-get install --only-upgrade -y apt-transport-https ca-certificates gnupg
 
-	curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-	sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-	echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-	sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
-	sudo apt-get update
-	sudo apt-get install -y kubectl
+	# Kubectl installation
+	if [ ! -f /etc/apt/keyrings/kubernetes-apt-keyring.gpg ]
+	then
+		curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+		sudo chmod 644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+		echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+		sudo chmod 644 /etc/apt/sources.list.d/kubernetes.list
+	fi
+	sudo apt-get install --only-upgrade -y kubectl
 }
 
 install_helm() {
