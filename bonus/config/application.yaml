@@ -10,7 +10,7 @@ spec:
     server: https://kubernetes.default.svc
   source:
     path: manifest/
-    repoURL: https://github.com/Manbqt/argocd-mbouquet.git
+    repoURL: http://gitlab-webservice-default.gitlab:8181/root/agocd-mbouquet.git
     targetRevision: HEAD
   syncPolicy:
     automated:

@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 spec:
   sourceRepos:
-    - https://github.com/Manbqt/argocd-mbouquet.git
+    - http://gitlab-webservice-default.gitlab:8181/root/agocd-mbouquet.git
   destinations:
     - namespace: dev
       server: 'https://kubernetes.default.svc'

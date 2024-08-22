@@ -81,7 +81,9 @@ argocd() {
 
 dev() {
 	kubectl create namespace dev
+}
 
+ingress() {
 	kubectl apply --wait -f ../config/ingress.yaml
 }
 
@@ -93,7 +95,7 @@ gitlab() {
 	helm upgrade --install gitlab gitlab/gitlab \
   		-n gitlab \
   		-f https://gitlab.com/gitlab-org/charts/gitlab/raw/master/examples/values-minikube-minimum.yaml \
-  		--set global.hosts.domain=gitlab.local \
+  		--set global.hosts.domain=local \
   		--set global.hosts.externalIP=0.0.0.0 \
   		--set global.hosts.https=false
 
@@ -111,7 +113,9 @@ then
 	wait_argocd
 	argocd
 	gitlab
+	push_gitlab
 	dev
+	ingress
 else
 	$1
 fi
