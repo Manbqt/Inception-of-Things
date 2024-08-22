@@ -40,10 +40,6 @@ argocd() {
 	echo "Username: \`admin\` Password: \`$passwd\`"
 }
 
-forward() {
-	kubectl -n argocd port-forward service/argocd-server 8080:80 --address=0.0.0.0
-}
-
 wait_argocd() {
 	# Wait for argocd-server to be ready
 	kubectl -n argocd wait --for=condition=available --timeout=600s deployment/argocd-server
@@ -52,7 +48,7 @@ wait_argocd() {
 dev() {
 	kubectl create namespace dev
 
-	kubectl apply --wait -f ../config/dev_ingress.yaml
+	kubectl apply --wait -f ../config/ingress.yaml
 }
 
 gitlab() {
@@ -80,7 +76,6 @@ then
 	argocd
 	gitlab
 	dev
-	forward
 else
 	$1
 fi
