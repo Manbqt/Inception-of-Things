@@ -100,7 +100,40 @@ gitlab() {
   		--set global.hosts.https=false
 
 
-	echo "The password of gitlab root is \`$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode)\`"
+	GITLAB_ROOT_PASSWORD=$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode)
+
+	echo "The password of gitlab root is \`${GITLAB_ROOT_PASSWORD}\`"
+}
+
+push_gitlab() {
+	GITLAB_ROOT_PASSWORD=$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode)
+	# Set the password for git push
+	echo "machine gitlab.local
+login root
+password ${GITLAB_ROOT_PASSWORD}" > ~/.netrc
+	chmod 600 ~/.netrc
+
+	GITLAB_URL="http://gitlab.local"
+	REPO_NAME="argocd-mbouquet"
+
+	# Get the access token
+	access_token=$(curl --silent --show-error --request POST \
+		--form "grant_type=password" --form "username=root" \
+		--form "password=$GITLAB_ROOT_PASSWORD" "$GITLAB_URL/oauth/token"
+	| jq -r '.access_token')
+
+	# Create a new project
+	curl --silent --show-error --request POST \
+		--header "Authorization: Bearer $access_token" \
+		--form "name=$REPO_NAME" --form "visibility=public" \
+		"$GITLAB_URL/api/v4/projects"
+
+	git clone https://github.com/Manbqt/$REPO_NAME.git /tmp/$REPO_NAME
+	cd /tmp/$REPO_NAME
+	git remote add gitlab $GITLAB_URL/root/$REPO_NAME.git
+	git push gitlab main
+	cd -
+	rm -rf /tmp/$REPO_NAME
 }
 
 if [ $# -eq 0 ]
