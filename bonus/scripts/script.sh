@@ -105,6 +105,10 @@ gitlab() {
 	echo "The password of gitlab root is \`${GITLAB_ROOT_PASSWORD}\`"
 }
 
+wait_gitlab() {
+	kubectl -n gitlab wait --for=condition=available --timeout=600s deployment/gitlab-webservice-default
+}
+
 push_gitlab() {
 	GITLAB_ROOT_PASSWORD=$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode)
 	# Set the password for git push
@@ -119,7 +123,7 @@ password ${GITLAB_ROOT_PASSWORD}" > ~/.netrc
 	# Get the access token
 	access_token=$(curl --silent --show-error --request POST \
 		--form "grant_type=password" --form "username=root" \
-		--form "password=$GITLAB_ROOT_PASSWORD" "$GITLAB_URL/oauth/token"
+		--form "password=$GITLAB_ROOT_PASSWORD" "$GITLAB_URL/oauth/token" \
 	| jq -r '.access_token')
 
 	# Create a new project
@@ -146,6 +150,7 @@ then
 	wait_argocd
 	argocd
 	gitlab
+	wait_gitlab
 	push_gitlab
 	dev
 	ingress
