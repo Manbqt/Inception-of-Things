@@ -36,7 +36,7 @@ helm template my-release mychart/ -f mychart/values.yaml
 # Install all templates
 helm install -f mychart/values.yaml mychart mychart/
 
-echo 'source <(kubectl completion bash)' >> ./home/vagrant/.profile
-echo 'alias k=kubectl' >> ./home/vagrant/.profile
-echo 'complete -o default -F __start_kubectl k' >> ./home/vagrant/.profile
+echo 'source <(kubectl completion bash)' >> /home/vagrant/.profile
+echo 'alias k=kubectl' >> /home/vagrant/.profile
+echo 'complete -o default -F __start_kubectl k' >> /home/vagrant/.profile
 
