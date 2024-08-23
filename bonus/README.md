@@ -1,7 +1,8 @@
-# Part3
+# Bonus
 
-## K3D
-It's a wrapper to run K3S in `docker`.
+In this part, we want deployed automatically our service `wil-playground` using our gitlab locally.
+It's the same project of P3, but we must used our gitlab.
 
-## ArgoCD
-It's a GitOps tool to deploy applications in Kubernetes.
+
+
+
