@@ -46,7 +46,7 @@ install_argocd() {
 	# Delete old cluster
 	k3d cluster delete mycluster
 	# Create a cluster
-	k3d cluster create mycluster --port 8888:80
+	k3d cluster create mycluster --port 8888:80 --agents 2
 
 	export KUBECONFIG_MODE="644"
 	export KUBECONFIG="/home/$USER/.config/k3d/kubeconfig-mycluster.yaml"
